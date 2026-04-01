@@ -1,17 +1,14 @@
 import Link from 'next/link'
+import { neon } from '@neondatabase/serverless'
 
 async function getContents(chapterId: string) {
-  const res = await fetch(
-    `http://localhost:3000/api/chapters/${chapterId}/contents`,
-    { cache: 'no-store' }
-  )
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch contents')
-  }
-
-  return res.json()
+  const sql = neon(process.env.DATABASE_URL as string)
+  return await sql`
+    SELECT * FROM contents 
+    WHERE chapter_id = ${chapterId} 
+    ORDER BY order_index ASC`
 }
+ 
 
 export default async function ChapterPage({
   params
